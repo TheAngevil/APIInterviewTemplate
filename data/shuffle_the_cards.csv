@@ -1,0 +1,38 @@
+Title,Description,Test Steps,Method,Request,Expected Response status,Expected Response Body
+Shiffle the cards response schema check,"Check suffle the card success, provide correct formate of response",1,GET,https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1,200,"{
+    ""success"": Bool,
+    ""deck_id"": String(12),
+    ""remaining"": Int,
+    ""shuffled"": Bool
+}"
+Shiffle the cards with 1 decks and check response success,"Check suffle the card success with 1 deck, provide correct number of cards and a deck_id",1,GET,https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1,200,"{
+    ""success"": true,
+    ""deck_id"": String(12),
+    ""remaining"": 52,
+    ""shuffled"": true
+}"
+Shiffle the cards with 2 decks and check response success,"Check suffle the card success with 2 decks, provide correct number of cards and ONE deck_id",1,GET,https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=2,200,"{
+    ""success"": true,
+    ""deck_id"": String(12),
+    ""remaining"": 104,
+    ""shuffled"": true
+}"
+Shiffle the cards with 20 decks and check response success,"Check suffle the card success with 20 decks, provide correct number of cards and ONE deck_id",1,GET,https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=20,200,"{
+    """"success"""": true,
+    """"deck_id"""": String(12),
+    """"remaining"""": 1040,
+    """"shuffled"""": true
+}"
+Shiffle the cards with 21 decks,Check suffle the card failed with 21 decks,1,GET,https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=21,200,"{
+    ""success"": false,
+    ""error"": ""The max number of Decks is 20.""
+}"
+Shiffle the cards with 0 deck,Check suffle the card failed by request deck_count = 0,1,GET,https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=0,200,"{
+    ""success"": false,
+    ""error"": ""The min number of Decks is 1.""
+}"
+Shiffle the cards with -1 deck,Check suffle the card failed by request deck_count = -1,1,GET,https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=-1,200,"{
+    ""success"": false,
+    ""error"": ""The min number of Decks is 1.""
+}"
+"Shiffle the cards with ""1"" deck","Check suffle the card failed by request deck_count = ""1"" as a string",1,GET,"https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=""1""",500,
