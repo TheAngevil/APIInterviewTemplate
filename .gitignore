@@ -179,3 +179,4 @@ cython_debug/
 .screenshot/
 
 *log
+.DS_Store
