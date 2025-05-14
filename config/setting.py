@@ -13,8 +13,7 @@ class EnumTestEnvironment(str, Enum):
 
 class Settings:
     DEFAULT_API_VERSION = 'v1'
-    # DEFAULT_SETTINGS_CONFIG = str(Path().cwd()/"config"/'setup.yml')
-    DEFAULT_SETTINGS_CONFIG = str(Path().cwd().parent/"config"/'setup.yml')
+    DEFAULT_SETTINGS_CONFIG = str(Path().cwd()/"config"/'setup.yml')
 
 
     def _init_variables(self):

@@ -34,7 +34,7 @@ def pytest_configure():
     log_file = logs_dir / f"{timestamp}.log"
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.WARNING,
         format="%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)",
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[

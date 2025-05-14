@@ -67,7 +67,8 @@ class Base(object):
             logging.warning("should provide url when sending request")
 
         if payload is None:
-            logging.warning("should provide payload when sending request")
+            if method != self.RequestMethod.GET:
+                logging.warning("should provide payload when sending request")
         else:
             _payload = payload
 
@@ -111,12 +112,6 @@ class Base(object):
 
 
 class BaseAssertion:
-
-    # @classmethod
-    # def logger(self):
-    #     config.
-    #     logger = logging.getLogger(__name__)
-    #     return
 
     @classmethod
     def log_assert(cls, func, messages):
@@ -165,4 +160,9 @@ class BaseAssertion:
     @classmethod
     def verify_general_bad_request_with_405(cls, res: Base.ResponseObject):
         cls.log_assert(res.status_code != 405,
+                       "Assertion Failure, The status code is not 405, body: {}".format(res.text))
+
+    @classmethod
+    def verify_general_bad_request_with_500(cls, res: Base.ResponseObject):
+        cls.log_assert(res.status_code != 500,
                        "Assertion Failure, The status code is not 405, body: {}".format(res.text))
