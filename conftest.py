@@ -21,10 +21,20 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session", autouse=True)
 def setup(request):
+    """
+    sorting commands variables from request and default variables and package as Settings Class
+    yield setup to
+    :param request:
+    :yield
+    """
     setup = Settings(request)
     yield setup
 
 def pytest_configure():
+    """
+    pytest_configure followed the known naming convention, and it is still called even without fixture decorated
+    :return: None
+    """
     project_path = Path.cwd()
     logs_dir = project_path / "logs"
     logs_dir.mkdir(exist_ok=True)

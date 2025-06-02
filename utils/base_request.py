@@ -4,9 +4,10 @@ from logging import config
 import uuid
 import requests
 from requests.models import Response
+import pytest
 
 logger = logging.getLogger(__name__)
-# logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.INFO)
+
 
 class Base(object):
 
@@ -21,6 +22,9 @@ class Base(object):
 
 
     class ResponseObject(object):
+        """
+        Process response
+        """
         def __init__(self, response: Response):
             self.status_code = response.status_code
             self.content = response.content
@@ -29,7 +33,8 @@ class Base(object):
                 self.json = response.json()
             except Exception as e:
                 self.json = None
-                logger.warning(e)
+                if self.status_code != 500:
+                    logger.warning(e, exc_info=True)
             self.header = response.headers
             self.url = response.url
 
@@ -57,18 +62,28 @@ class Base(object):
                      headers=None,
                      files: list = None
                      ) -> ResponseObject:
-
+        """
+        construct API request
+        :param method:
+        :param payload:
+        :param chunk_size:
+        :param cookies:
+        :param custom_url:
+        :param headers:
+        :param files:
+        :return:
+        """
         _payload = None
 
-        if files:
+        if files: # to ensure _payload is a dictionary when file uploads are included, avoiding potential errors when constructing multipart/form-data requests.
             _payload = {}
 
         if custom_url is None:
-            logging.warning("should provide url when sending request")
+            logger.warning("should provide url when sending request")
 
         if payload is None:
             if method != self.RequestMethod.GET:
-                logging.warning("should provide payload when sending request")
+                logger.warning("should provide payload when sending request")
         else:
             _payload = payload
 
@@ -92,7 +107,7 @@ class Base(object):
             case  self.RequestMethod.PATCH:
                 res = session_res.patch(custom_url, headers=_headers, cookies=cookies, stream=True, json=_payload, files=files)
             case _:
-                res = session_res.put(custom_url, headers=_headers, cookies=cookies, stream=True, data=_payload, files=files)
+                res = session_res.get(custom_url, headers=_headers, cookies=cookies, stream=True)
 
         res_obj = self.ResponseObject(res)
 
@@ -112,57 +127,62 @@ class Base(object):
 
 
 class BaseAssertion:
+    """
+    Base assertion Class
+    """
 
     @classmethod
     def log_assert(cls, func, messages):
         if not func:
             logging.error(messages)
         assert func, messages
+        if not pytest.assume(func):
+            logger.error(messages, stacklevel=4)
 
     @classmethod
     def verify_general_response_code_200(cls, res: Base.ResponseObject):
-        cls.log_assert(res.status_code == 200, "Assertion Failure, The status code is not 200, body: {}".format(res.text))
+        cls.log_assert(res.status_code == 200, "Assertion Failure, The status code is not 200, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_response_code_with_201(cls, res: Base.ResponseObject):
         cls.log_assert(res.status_code == 201,
-                       "Assertion Failure, The status code is not 201, body: {}".format(res.text))
+                       "Assertion Failure, The status code is not 201, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_response_code_with_202(cls, res: Base.ResponseObject):
-        cls.log_assert(res.status_code == 202, "Assertion Failure, The status code is not 202, body: {}".format(res.text))
+        cls.log_assert(res.status_code == 202, "Assertion Failure, The status code is not 202, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_response_code_with_204(cls, res: Base.ResponseObject):
         cls.log_assert(res.status_code == 204,
-                       "Assertion Failure, The status code is not 204, body: {}".format(res.text))
+                       "Assertion Failure, The status code is not 204, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_general_forbidden_response_code(cls, res: Base.ResponseObject):
         cls.log_assert(res.status_code == 403,
-                       "Assertion Failure, The status code is not 403, body: {}".format(res.text))
+                       "Assertion Failure, The status code is not 403, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_response_code_with_404(cls, res: Base.ResponseObject):
         cls.log_assert(res.status_code == 404,
-                       "Assertion Failure, The status code is not 404, body: {}".format(res.text))
+                       "Assertion Failure, The status code is not 404, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_general_bad_request(cls, res: Base.ResponseObject):
-        cls.log_assert(res.status_code != 400,
-                       "Assertion Failure, The status code is not 400, body: {}".format(res.text))
+        cls.log_assert(res.status_code == 400,
+                       "Assertion Failure, The status code is not 400, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_general_bad_request_with_403(cls, res: Base.ResponseObject):
-        cls.log_assert(res.status_code != 403,
-                       "Assertion Failure, The status code is not 403, body: {}".format(res.text))
+        cls.log_assert(res.status_code == 403,
+                       "Assertion Failure, The status code is not 403, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_general_bad_request_with_405(cls, res: Base.ResponseObject):
-        cls.log_assert(res.status_code != 405,
-                       "Assertion Failure, The status code is not 405, body: {}".format(res.text))
+        cls.log_assert(res.status_code == 405,
+                       "Assertion Failure, The status code is not 405, res.status code: {}".format(res.status_code))
 
     @classmethod
     def verify_general_bad_request_with_500(cls, res: Base.ResponseObject):
-        cls.log_assert(res.status_code != 500,
-                       "Assertion Failure, The status code is not 405, body: {}".format(res.text))
+        cls.log_assert(res.status_code == 500,
+                       "Assertion Failure, The status code is not 500, res.status code: {}".format(res.status_code))

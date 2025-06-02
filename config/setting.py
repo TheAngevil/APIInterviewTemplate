@@ -20,7 +20,10 @@ class Settings:
         self.url_prefix = self.setup_config[self.environment]["URL_PREFIX"]
 
     def __init__(self, request) -> None:
-        # get custom config from command line args
+        """
+        get custom config from command line args
+        :param request:
+        """
         args = {
             'env': request.config.getoption('--env', default=None),
             'dataset': request.config.getoption('--dataset', default=None),
@@ -36,6 +39,11 @@ class Settings:
         self._init_variables()
 
     def set_env(self, env: str):
+        """
+        Called in the __init_ to set self.environment, default: STAGING
+        :param env: from command line
+        :return: None
+        """
         self.environment = None
         for enum_env in EnumTestEnvironment:
             if env.upper() == enum_env.value:
