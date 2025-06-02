@@ -1,6 +1,5 @@
 from enum import Enum
 import logging
-from logging import config
 import uuid
 import requests
 from requests.models import Response
@@ -133,9 +132,6 @@ class BaseAssertion:
 
     @classmethod
     def log_assert(cls, func, messages):
-        if not func:
-            logging.error(messages)
-        assert func, messages
         if not pytest.assume(func):
             logger.error(messages, stacklevel=4)
 
